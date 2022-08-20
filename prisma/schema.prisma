@@ -8,35 +8,14 @@ datasource db {
 }
 
 model post_visibilities {
-  id    Int     @id @default(autoincrement())
-  name  String  @db.VarChar(20)
-  posts posts[]
-}
-
-model posts {
-  id                Int               @id @default(autoincrement())
-  title             String            @db.VarChar(60)
-  url_image         String?           @db.VarChar(255)
-  content           String            @db.Text
-  created_at        DateTime?         @default(now()) @db.DateTime(0)
-  updated_at        DateTime?         @default(now()) @db.DateTime(0)
-  visibility_id     Int               @default(1)
-  post_visibilities post_visibilities @relation(fields: [visibility_id], references: [id], onDelete: Cascade, map: "posts_ibfk_1")
-
-  @@index([visibility_id], map: "visibility_id")
-  @@map("post")
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(20)
+  post post[]
 }
 
 model role_post_user {
   id   Int    @id @default(autoincrement())
   name String @db.VarChar(20)
-}
-
-model roles {
-  id         Int          @id @default(autoincrement())
-  name       String       @db.VarChar(20)
-  user_roles user_roles[]
-  @@map("role")
 }
 
 model user_posts {
@@ -47,23 +26,44 @@ model user_posts {
 }
 
 model user_roles {
-  id      Int   @id @default(autoincrement())
+  id      Int  @id @default(autoincrement())
   user_id Int
   role_id Int
-  users   users @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_roles_ibfk_1")
-  roles   roles @relation(fields: [role_id], references: [id], onDelete: Cascade, map: "user_roles_ibfk_2")
+  user    user @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_roles_ibfk_1")
+  role    role @relation(fields: [role_id], references: [id], onDelete: Cascade, map: "user_roles_ibfk_2")
 
-  @@index([role_id], map: "role_id")
-  @@index([user_id], map: "user_id")
+  @@index([user_id], map: "user_roles_ibfk_1")
+  @@index([role_id], map: "user_roles_ibfk_2")
 }
 
 model user_status {
-  id    Int     @id @default(autoincrement())
-  name  String  @db.VarChar(20)
-  users users[]
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(20)
+  user user[]
 }
 
-model users {
+model post {
+  id                Int               @id @default(autoincrement())
+  title             String            @db.VarChar(60)
+  url_image         String?           @db.VarChar(255)
+  content           String            @db.Text
+  created_at        DateTime?         @default(now()) @db.DateTime(0)
+  updated_at        DateTime?         @default(now()) @db.DateTime(0)
+  visibility_id     Int               @default(1)
+  post_visibilities post_visibilities @relation(fields: [visibility_id], references: [id], onDelete: Cascade, map: "posts_ibfk_1")
+
+  @@index([visibility_id], map: "visibility_id")
+  @@map("posts")
+}
+
+model role {
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(20)
+  user_roles user_roles[]
+  @@map("roles")
+}
+
+model user {
   id                    Int          @id @default(autoincrement())
   email                 String       @unique(map: "email") @db.VarChar(255)
   name                  String       @db.VarChar(40)
@@ -75,11 +75,11 @@ model users {
   token_expiration_date DateTime?    @db.DateTime(0)
   created_at            DateTime?    @default(now()) @db.DateTime(0)
   updated_at            DateTime?    @default(now()) @db.DateTime(0)
-  email_validado        Boolean?     @default(false)
+  email_validated       Boolean?     @default(false)
   avatar_url            String?      @db.VarChar(255)
   user_status           user_status? @relation(fields: [status_id], references: [id], onDelete: Cascade, map: "users_ibfk_1")
   user_roles            user_roles[]
 
   @@index([status_id], map: "status_id")
-  @@map("user")
+  @@map("users")
 }

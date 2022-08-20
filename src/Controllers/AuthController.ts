@@ -43,12 +43,10 @@ export default class AuthController {
             const { email, password } = req.body as user
             
             const user = await UserService.login(email) as user
-            if(!user)
+
+            if(!user || !await Password.compare(password, user.password))
                 return res.status(404).json("User not found")
 
-            if(!Password.compare(password, user.password))
-                return res.status(404).json("User not found")
-            
             user.token = Token.create(user.id)
             user.token_expiration_date = Token.createExpirationDate()
             
