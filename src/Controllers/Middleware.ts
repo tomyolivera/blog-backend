@@ -17,7 +17,7 @@ export default class Middleware {
             const token = Middleware.getToken(req)
             if(!token || token === "" || !Token.verify(token)) return res.status(401).json("Unauthorized")
             
-            const user = await UserService.getByToken(token)
+            const user = await UserService.getByToken(token)            
             if(!user || !user.token_expiration_date || user.token_expiration_date < new Date()) return res.status(403).json("Forbidden")
             
             return next()

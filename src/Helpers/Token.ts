@@ -1,14 +1,21 @@
+import { user } from "@prisma/client"
 import { sign, verify } from "jsonwebtoken"
 
+export type TDecoded = {
+    user: user,
+    iat: number,
+    exp: number
+}
+
 export default class Token {
-    static create(id: number)
+    static create(user: user)
     {
-        return sign({ id }, process.env["JWT_SECRET"] as string, { expiresIn: "1d" })
+        return sign({ user }, process.env["JWT_SECRET"] as string, { expiresIn: "1d" })
     }
 
-    static verify(token: string)
+    static verify(token: string="")
     {
-        return verify(token, process.env["JWT_SECRET"] as string)
+        return verify(token, process.env["JWT_SECRET"] as string) as TDecoded
     }
 
     static createExpirationDate(): Date

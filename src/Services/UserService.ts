@@ -7,15 +7,15 @@ export default class UserService {
     {
         return await prisma.user.findFirst({
             where: { email },
-            select: {...exclude_user_data, password: true}
+            select: {...exclude_user_data, password: true},
         })
     }
 
-    static async getByProp(prop: string, value: string)
+    static async getByProp(prop: string, value: string|number)
     {
         return await prisma.user.findFirst({
             where: { [prop]: value },
-            select: exclude_user_data
+            select: exclude_user_data,
         })
     }
 
@@ -23,7 +23,7 @@ export default class UserService {
     {
         return await prisma.user.findFirst({
             where: { token },
-            select: {...exclude_user_data, token: true, token_expiration_date: true}
+            select: {...exclude_user_data, token: true, token_expiration_date: true},
         })
     }
 

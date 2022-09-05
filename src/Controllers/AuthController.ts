@@ -7,9 +7,17 @@ import SUser from "../Schemas/SUser"
 import Model from "../Models/Model"
 import Password from "../Helpers/Password"
 import Token from "../Helpers/Token"
+import Middleware from "./Middleware"
+import { EUserStatus } from "../Enums/EUserStatus"
+
+/* TODO
+ * ---------------------------------------------------------------------
+ *  Optimizar codigo obteniendo el usuario de una manera mas rapida
+ * ---------------------------------------------------------------------
+*/
 
 export default class AuthController {
-    static async register(req: Request, res: Response)
+    static async register(req: Request, res: Response): Promise<Response>
     {
         try {
             const { isValid, errors } = await Model.validate(req.body, SUser)
@@ -37,7 +45,7 @@ export default class AuthController {
         }
     }
 
-    static async login(req: Request, res: Response)
+    static async login(req: Request, res: Response): Promise<Response>
     {
         try {
             const { email, password } = req.body as user
@@ -47,7 +55,7 @@ export default class AuthController {
             if(!user || !await Password.compare(password, user.password))
                 return res.status(404).json("User not found")
 
-            user.token = Token.create(user.id)
+            user.token = Token.create({...user, password: ""}) 
             user.token_expiration_date = Token.createExpirationDate()
             
             await UserService.update(user)
@@ -59,10 +67,20 @@ export default class AuthController {
         }
     }
 
-    static async logout(req: Request, res: Response)
+    static async logout(req: Request, res: Response): Promise<Response>
     {
         try {
-            
+            const token = Middleware.getToken(req)
+            const user = await UserService.getByToken(token)
+            if(!user) return res.status(404).json("User not found")
+
+            user.token = null
+            user.token_expiration_date = null
+            user.status_id = EUserStatus.OFFLINE
+
+            await UserService.update(user)
+
+            return res.status(200).json("Logged Out")
         } catch (error) {
             console.log(error)
             return res.status(500).json(error)
