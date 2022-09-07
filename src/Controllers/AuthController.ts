@@ -49,13 +49,13 @@ export default class AuthController {
     {
         try {
             const { email, password } = req.body as user
-            
+
             const user = await UserService.login(email) as user
 
             if(!user || !await Password.compare(password, user.password))
                 return res.status(404).json("User not found")
 
-            user.token = Token.create({...user, password: ""}) 
+            user.token = Token.create({...user, password: ""})
             user.token_expiration_date = Token.createExpirationDate()
             
             await UserService.update(user)

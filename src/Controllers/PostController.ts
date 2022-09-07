@@ -5,7 +5,6 @@ import Model from "../Models/Model"
 import SPost from "../Schemas/SPost"
 
 import PostService from "../Services/PostService"
-import Middleware from "./Middleware"
 
 export default class PostController {
     static async getAll(req: Request, res: Response): Promise<Response>
@@ -47,11 +46,10 @@ export default class PostController {
     {
         try {
             const post: post = req.body
-            const { user } = Token.verify(Middleware.getToken(req))
-
-            console.log(user);
-
+            
+            const { user } = Token.verify(req.headers.authorization)
             post.user_id = user.id
+
             // If visibility is not passed at body, set 1 as default
             if(!post.visibility_id) post.visibility_id = 1
 
@@ -80,7 +78,8 @@ export default class PostController {
 
             // If the data is the same, don't update
             if(newPostData.title === post.title &&
-                newPostData.content === post.content)
+                newPostData.content === post.content &&
+                newPostData.url_image === post.url_image)
                 return res.status(200).json(post)
 
             // Validation
@@ -103,7 +102,7 @@ export default class PostController {
             const post = await PostService.getById(id)
             if(!post) return res.status(404).json("Post not found")
 
-            const { user } = Token.verify(Middleware.getToken(req))
+            const { user } = Token.verify(req.headers.authorization)
             
             if(user.id !== post.user_id) return res.status(403).json("Forbidden")
             

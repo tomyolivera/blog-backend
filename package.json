@@ -27,6 +27,7 @@
     "prisma-exclude": "^1.0.2",
     "socket.io": "^4.5.1",
     "ts-node": "^10.9.1",
+    "uuid": "^9.0.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {

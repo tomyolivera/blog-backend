@@ -15,7 +15,8 @@ export default class Token {
 
     static verify(token: string="")
     {
-        return verify(token, process.env["JWT_SECRET"] as string) as TDecoded
+        const tkn = token.replace("Bearer ", "")
+        return verify(tkn, process.env["JWT_SECRET"] as string) as TDecoded
     }
 
     static createExpirationDate(): Date

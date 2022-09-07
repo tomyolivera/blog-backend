@@ -25,17 +25,6 @@ model user_posts {
   role_user_post_id Int
 }
 
-model user_roles {
-  id      Int  @id @default(autoincrement())
-  user_id Int
-  role_id Int
-  user    user @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_roles_ibfk_1")
-  role    role @relation(fields: [role_id], references: [id], onDelete: Cascade, map: "user_roles_ibfk_2")
-
-  @@index([user_id], map: "user_roles_ibfk_1")
-  @@index([role_id], map: "user_roles_ibfk_2")
-}
-
 model user_status {
   id   Int    @id @default(autoincrement())
   name String @db.VarChar(20)
@@ -60,9 +49,8 @@ model post {
 }
 
 model role {
-  id         Int          @id @default(autoincrement())
-  name       String       @db.VarChar(20)
-  user_roles user_roles[]
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(20)
 
   @@map("roles")
 }
@@ -75,15 +63,16 @@ model user {
   username              String       @unique(map: "username") @db.VarChar(20)
   password              String       @db.VarChar(80)
   status_id             Int?         @default(1)
-  token                 String?      @db.VarChar(100)
+  role                  String       @default("ROLE_USER") @db.VarChar(20)
+  token                 String?      @db.Text
   token_expiration_date DateTime?    @db.DateTime(0)
   created_at            DateTime?    @default(now()) @db.DateTime(0)
   updated_at            DateTime?    @default(now()) @db.DateTime(0)
   email_validated       Boolean?     @default(false)
   avatar_url            String?      @db.VarChar(255)
+  enabled               Boolean      @default(true)
   user_status           user_status? @relation(fields: [status_id], references: [id], onDelete: Cascade, map: "users_ibfk_1")
   posts                 post[]       @relation("postsTousers")
-  user_roles            user_roles[]
 
   @@index([status_id], map: "status_id")
   @@map("users")

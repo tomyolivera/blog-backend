@@ -4,14 +4,15 @@ const postRouter = Router()
 import PostController from '../Controllers/PostController'
 import { isAuthenticated } from '../Controllers/Middleware'
 
-postRouter
-    .get('/', PostController.getAll)
-    .get('/user/:user_id', PostController.getByUserId)
-    .post('/', isAuthenticated, PostController.create)
+postRouter.get('/user/:user_id', PostController.getByUserId)
 
-    .route('/:id')
-        .get(PostController.getById)
-        .put(isAuthenticated, PostController.update)
-        .delete(isAuthenticated, PostController.delete)
+postRouter.route('/')
+    .get(PostController.getAll)
+    .post(isAuthenticated, PostController.create)
+
+postRouter.route('/:id')
+    .get(PostController.getById)
+    .put(isAuthenticated, PostController.update)
+    .delete(isAuthenticated, PostController.delete)
 
 export default postRouter

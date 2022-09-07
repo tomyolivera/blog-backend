@@ -14,16 +14,17 @@ export default class UserService {
     static async getByProp(prop: string, value: string|number)
     {
         return await prisma.user.findFirst({
-            where: { [prop]: value },
-            select: exclude_user_data,
+            where: { [prop]: value }
         })
     }
 
-    static async getByToken(token: string)
+    static async getByToken(token: string, data=true)
     {
+        const tkn = token.replace("Bearer ", "")
+
         return await prisma.user.findFirst({
-            where: { token },
-            select: {...exclude_user_data, token: true, token_expiration_date: true},
+            where: { token: tkn },
+            select: {...exclude_user_data, token: data, token_expiration_date: data, user_status: true},
         })
     }
 
@@ -31,21 +32,23 @@ export default class UserService {
     {
         return await prisma.user.create({
             data: user,
-            select: exclude_user_data
+            select: {...exclude_user_data, user_status: true}
         })
     }
 
     static async update(user: any)
     {
         return await prisma.user.update({
+            select: exclude_user_data,
+            data: user,
             where: { id: user.id },
-            data: user
         })
     }
-
+    
     static async delete(id: number)
     {
         return await prisma.user.delete({
+            select: exclude_user_data,
             where: { id }
         })
     }
